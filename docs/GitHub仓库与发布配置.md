@@ -1,6 +1,6 @@
 # GitHub 仓库与发布配置
 
-更新日期：2026-11-02。账号 `feifandiv`，私有准备仓库 `feifan-life` 已创建，本地 main 与 origin 已配置，GPL-3.0-only 已应用。源码推送及 Actions 验收进展见 [发布状态](开源许可与发布状态.md)。
+更新日期：2026-11-02。账号 `feifandiv`，仓库 `feifan-life` 已公开，0.2.0 Release 已发布，GPL-3.0-only 已应用。源码推送及 Actions 验收进展见 [发布状态](开源许可与发布状态.md)。下文保留从准备到发布的复用操作说明。
 
 ## 两个工程
 

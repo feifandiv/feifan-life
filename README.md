@@ -19,7 +19,7 @@ The current interface is Chinese. Desktop only. A fresh installation starts empt
 
 ## Status
 
-First public release preparation; not yet listed in the Obsidian community directory. Requires Obsidian 1.14.5 or later. Native checks used macOS with Obsidian 1.14.5; Windows and Linux are not yet verified. See the [release checklist](docs/发布准备清单.md) and [acceptance record](docs/普适化验收记录.md).
+[Version 0.2.0 is available on GitHub](https://github.com/feifandiv/feifan-life/releases/tag/0.2.0); not yet listed in the Obsidian community directory. Requires Obsidian 1.14.5 or later. Native checks used macOS with Obsidian 1.14.5; Windows and Linux are not yet verified. See the [release checklist](docs/发布准备清单.md) and [acceptance record](docs/普适化验收记录.md).
 
 Version 0.2.0 has no account, payments, AI or enforced quotas. Existing local features are free; future support-edition proposals are drafts, not services currently offered for sale.
 
@@ -63,6 +63,6 @@ The public plugin identifier is `feifan-life`. It has its own data and view iden
 
 Copyright (c) 2026 Feifan and respective contributors. The client is licensed under [GPL-3.0-only](LICENSE). Third-party assets retain their own licenses; see [notices](THIRD_PARTY_NOTICES.md).
 
-After the repository is published, use its **Issues** tab for bugs and suggestions. Do not upload private notes, account records, backups or keys. See [contributing](CONTRIBUTING.md), [security reporting](SECURITY.md), and [changelog](CHANGELOG.md).
+Use [Issues](https://github.com/feifandiv/feifan-life/issues) for bugs and suggestions. Do not upload private notes, account records, backups or keys. Use the private security reporting link in [SECURITY.md](SECURITY.md) for vulnerabilities. See [contributing](CONTRIBUTING.md) and [changelog](CHANGELOG.md).
 
 Publication preparation: [GitHub setup](docs/GitHub仓库与发布配置.md), [release status](docs/开源许可与发布状态.md), [product entitlements](docs/产品权益与授权边界.md). Local workflow files do not establish a successful GitHub Actions run.
