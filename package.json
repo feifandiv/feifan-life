@@ -1,0 +1,36 @@
+{
+  "name": "feifan-life",
+  "version": "0.2.0",
+  "license": "GPL-3.0-only",
+  "homepage": "https://github.com/feifandiv/feifan-life#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/feifandiv/feifan-life.git"
+  },
+  "bugs": {
+    "url": "https://github.com/feifandiv/feifan-life/issues"
+  },
+  "description": "非凡人生 - 个人生活管理系统",
+  "scripts": {
+    "dev": "node esbuild.config.mjs dev",
+    "build": "node esbuild.config.mjs build",
+    "typecheck": "tsc --noEmit",
+    "test": "node scripts/test.mjs",
+    "check:public": "node scripts/check-public.mjs",
+    "prepare:showcase": "npm run build && node scripts/prepare-showcase.mjs"
+  },
+  "devDependencies": {
+    "@types/jsdom": "21.1.7",
+    "@types/node": "^20.14.0",
+    "builtin-modules": "^5.3.0",
+    "esbuild": "0.28.2",
+    "jsdom": "26.1.0",
+    "lucide": "1.8.0",
+    "obsidian": "1.14.4",
+    "postcss": "^8.5.31",
+    "postcss-selector-parser": "7.1.6",
+    "postcss-value-parser": "^4.2.0",
+    "tslib": "2.6.3",
+    "typescript": "^5.5.4"
+  }
+}

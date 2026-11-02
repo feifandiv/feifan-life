@@ -1,0 +1,14 @@
+.ff-ui .ff-review-modal-el { width: 760px; max-width: calc(100vw - 32px); }
+.ff-ui .ff-review-modal { padding: 0; }
+.ff-ui .ff-review-modal-body { display: flex; flex-direction: column; gap: 20px; }
+.ff-ui .ff-review-meta,
+.ff-ui .ff-review-entries { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; }
+.ff-ui .ff-review-field { min-width: 0; }
+.ff-ui .ff-review-input { width: 100%; box-sizing: border-box; }
+.ff-ui .ff-review-textarea { min-height: 112px; resize: vertical; }
+.ff-ui .ff-review-status { color: var(--ff-text-secondary); min-height: 20px; }
+.ff-ui .ff-review-modal-footer { display: flex; justify-content: flex-end; gap: 8px; padding-top: 16px; }
+@media(max-width:600px) {
+  .ff-ui .ff-review-meta,
+  .ff-ui .ff-review-entries { grid-template-columns: minmax(0,1fr); }
+}

@@ -1,0 +1,14 @@
+node_modules/
+build/
+.DS_Store
+.test-cache/
+.obsidian/
+*.log
+.env
+.env.*
+!.env.example
+**/data.json
+**/snapshot.json
+backups/
+review-output/
+.showcase/

@@ -1,0 +1,16 @@
+.ff-ui .fl-preferences { min-width: 0; }
+.ff-ui .fl-preferences .setting-item { gap: 16px; align-items: center; }
+.ff-ui .fl-preferences .setting-item-info { min-width: 88px; }
+.ff-ui .fl-preferences .setting-item-control { min-width: 0; max-width: 100%; }
+.ff-ui .fl-preferences input:not([type="range"]):not([type="checkbox"]) {
+  width: 260px; max-width: 100%; min-width: 0; box-sizing: border-box;
+}
+.ff-ui .fl-preferences-status { min-height: 24px; color: var(--ff-text-muted); }
+.ff-ui .hero .chip-btn svg { width: 16px; height: 16px; }
+.ff-ui .hero { background-size: cover; background-position: center; background-repeat: no-repeat; }
+.ff-ui .fl-preferences .setting-item[hidden] { display: none; }
+@media (max-width: 600px) {
+  .ff-ui .fl-preferences .setting-item { align-items: stretch; flex-direction: column; gap: 8px; }
+  .ff-ui .fl-preferences .setting-item-control { justify-content: flex-start; width: 100%; }
+  .ff-ui .fl-preferences input:not([type="range"]):not([type="checkbox"]) { width: 100%; }
+}

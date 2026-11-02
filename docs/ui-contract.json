@@ -1,0 +1,58 @@
+{
+  "name": "Feifan UI Contract",
+  "version": "1.1",
+  "updatedAt": "2026-11-02",
+  "palette": "palette-1",
+  "normativeSpec": "10-非凡UI1.1设计与交互规范.md",
+  "tokenAuthority": "../src/design-system/tokens.css",
+  "generatedTokenIndex": "design-tokens.json",
+  "semantics": {
+    "MUST": "required for new or changed UI; exceptions require documented scope and reason",
+    "SHOULD": "recommended; deviations require a reason",
+    "requirementsAreNotPassResults": true,
+    "rulesAreManuallyReviewedUnlessAReportStatesOtherwise": true
+  },
+  "rules": [
+    { "id": "FF-01", "level": "MUST", "scope": "core", "requirement": "Use shared semantic tokens and components inside the plugin theme root; centralize host adaptation and remove superseded rules.", "verify": ["source review", "host and portal computed styles"] },
+    { "id": "FF-02", "level": "MUST", "scope": "core", "requirement": "Use the approved four color roles and neutral support only; do not create chromatic tints or page palettes.", "verify": ["token diff", "computed color audit including pseudo-elements and charts"] },
+    { "id": "FF-03", "level": "MUST", "scope": "core", "requirement": "Resolve one effective mode; keep text and necessary controls readable in each mode, including portals and photo overlays.", "verify": ["light and dark contrast", "host theme switch", "portal theme"] },
+    { "id": "FF-04", "level": "MUST", "scope": "core", "requirement": "Use opaque content surfaces; remove decorative nested frames while retaining necessary field and focus boundaries.", "verify": ["surface alpha audit", "full-page visual inspection", "keyboard focus"] },
+    { "id": "FF-05", "level": "MUST", "scope": "core", "requirement": "Use shared dimensions and stable geometry; never scale typography down with viewport width.", "verify": ["token usage", "long labels", "loading and hover geometry"] },
+    { "id": "FF-06", "level": "MUST", "scope": "core", "requirement": "Keep one primary command per action group and consistent P0/P1/P2/P3 recipes; accompany color with text or icons.", "verify": ["cross-page priority audit", "command and status review"] },
+    { "id": "FF-07", "level": "MUST", "scope": "core", "requirement": "Associate permanent labels and errors; constrain shrinkable fields and intrinsic-width menus to the viewport.", "verify": ["long options", "field label association", "narrow-window overflow"] },
+    { "id": "FF-08", "level": "MUST", "scope": "core", "requirement": "Provide named tools, keyboard access, visible focus and correct modal/menu lifecycles in the owning document.", "verify": ["keyboard traversal", "nested Escape", "focus return", "secondary window", "unload cleanup"] },
+    { "id": "FF-09", "level": "MUST", "scope": "core", "requirement": "Notify queued local changes promptly without claiming durable success; preserve save verification and propagate failures.", "verify": ["pending and duplicate-submit behavior", "save failure", "empty state", "menu pointer and keyboard scrolling"] },
+    { "id": "FF-10", "level": "SHOULD", "scope": "core", "requirement": "Respect reduced motion and measure input-to-visible-feedback separately from persistence.", "verify": ["reduced-motion preference", "representative latency samples with environment and data size"] },
+    { "id": "LIFE-01", "level": "MUST", "scope": "feifan-life", "requirement": "Divide overview module entries equally in one row without a partially empty second row.", "verify": ["module-count variants", "narrow-window layout"] },
+    { "id": "LIFE-02", "level": "MUST", "scope": "feifan-life", "requirement": "Place habits first, heat and progress second, full-width trend last; preserve title spacing and stack below 700px.", "verify": ["desktop and narrow ordering", "heat title gap"] },
+    { "id": "LIFE-03", "level": "MUST", "scope": "feifan-life", "requirement": "Group each ledger's five metrics in one neutral surface without individual decorative frames.", "verify": ["personal and business ledger visual review"] },
+    { "id": "LIFE-04", "level": "MUST", "scope": "feifan-life", "requirement": "Keep eight main modules; do not restore token UI or scans; preserve historical business fields.", "verify": ["navigation and command review", "data migration scope"] },
+    { "id": "LIFE-05", "level": "MUST", "scope": "feifan-life", "requirement": "Bundle offline licensed photos with source records and readable overlays; retain solid and custom options without losing custom paths; do not derive UI palettes from photos.", "verify": ["asset license and network review", "hero readability in both modes", "preset persistence"] },
+    { "id": "LIFE-06", "level": "MUST", "scope": "feifan-life", "requirement": "Provide a new-review command and shared opaque form; open existing same-date notes without overwriting; show durable creation results and retain input on failure.", "verify": ["native create and open", "duplicate and concurrent creation", "validation and write failures"] }
+  ],
+  "performanceGoal": {
+    "metric": "input-to-visible-feedback",
+    "percentile": 95,
+    "maxMilliseconds": 100,
+    "status": "target-not-fully-benchmarked",
+    "excludes": "durable disk save time"
+  },
+  "acceptance": {
+    "fullMatrixFor": ["theme changes", "shared component changes"],
+    "views": 17,
+    "modes": ["light", "dark"],
+    "viewports": [[1600, 1050], [1024, 768], [390, 844]],
+    "browserCombinations": 102,
+    "nativeHostCheckRequiredForPluginChanges": true,
+    "narrowViewportDoesNotEstablishMobileSupport": true,
+    "publicDemoData": "synthetic-only"
+  },
+  "knownGaps": [
+    "universal dirty-form close confirmation",
+    "complete async pending and error coverage",
+    "full keyboard and assistive-technology audit",
+    "representative p95 performance benchmark",
+    "public-release OS and minimum-app-version verification",
+    "standalone framework-neutral component package"
+  ]
+}

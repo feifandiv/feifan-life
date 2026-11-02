@@ -1,0 +1,20 @@
+name: 功能建议
+description: 描述你要完成的工作及当前遇到的阻碍
+title: "[Feature] "
+body:
+  - type: textarea
+    id: workflow
+    attributes:
+      label: 使用场景与问题
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: 希望的结果
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: 已尝试的方法

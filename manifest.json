@@ -1,0 +1,9 @@
+{
+  "id": "feifan-life",
+  "name": "Feifan Life",
+  "version": "0.2.0",
+  "minAppVersion": "1.4.0",
+  "description": "Manage projects, tasks, goals, finances, habits, lists and reviews in one local workspace.",
+  "author": "非凡",
+  "isDesktopOnly": true
+}

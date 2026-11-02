@@ -1,0 +1,38 @@
+name: 错误报告
+description: 报告可以复现的功能或显示问题
+title: "[Bug] "
+body:
+  - type: markdown
+    attributes:
+      value: "请使用虚构数据。不要上传完整知识库、data.json、备份、账目或密钥。安全问题先阅读 SECURITY.md。"
+  - type: input
+    id: plugin_version
+    attributes:
+      label: 插件版本
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Obsidian 版本与操作系统
+      placeholder: "例如 Obsidian 1.14.5 / macOS"
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: 复现步骤
+      description: 从哪个模块开始，依次做了什么？
+    validations:
+      required: true
+  - type: textarea
+    id: result
+    attributes:
+      label: 预期结果与实际结果
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: 主题、snippet 和已脱敏的截图或错误信息
+      description: 可选；请先遮盖私人内容。
