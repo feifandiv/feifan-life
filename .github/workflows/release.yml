@@ -38,6 +38,8 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
+      - run: npm run check:release
+      - run: node scripts/license-inventory.mjs --check
       - run: npm run check:public
       - name: Create draft with the three Obsidian install assets
         env:
@@ -46,4 +48,4 @@ jobs:
         run: |
           gh release create "$RELEASE_TAG" \
             build/main.js build/manifest.json build/styles.css \
-            --verify-tag --draft --title "$RELEASE_TAG" --generate-notes
+            --verify-tag --draft --title "$RELEASE_TAG" --notes-file "docs/releases/$RELEASE_TAG.md"

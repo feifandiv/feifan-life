@@ -17,10 +17,11 @@ npm ci
 npm run typecheck
 npm test
 npm run build
+npm run check:release
 npm run check:public
 ```
 
-仅把 `build/` 中的三个插件文件安装到自己的测试知识库。请勿把运行数据提交到仓库，禁止安装脚本自动覆盖个人插件。
+仅把 `build/` 中的三个插件文件安装到自己的测试知识库。请勿把运行数据提交到仓库，禁止安装脚本自动覆盖个人插件。依赖变动后执行 `npm run licenses:inventory` 更新许可声明清单。
 
 UI 变更先读 [设计规范](docs/10-非凡UI1.1设计与交互规范.md) 和 [机器可读契约](docs/ui-contract.json)，复用共享语义色与组件。源码、文档及受影响截图保持一致；数据结构变更需说明迁移、备份、失败行为及回退边界。
 

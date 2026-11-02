@@ -19,7 +19,7 @@ The current interface is Chinese. Desktop only. A fresh installation starts empt
 
 ## Status
 
-First public release preparation; not yet listed in the Obsidian community directory. Native checks used macOS with Obsidian 1.14.5. The inherited minimum app version and other operating systems are not verified. See the [release checklist](docs/发布准备清单.md) and [acceptance record](docs/普适化验收记录.md).
+First public release preparation; not yet listed in the Obsidian community directory. Requires Obsidian 1.14.5 or later. Native checks used macOS with Obsidian 1.14.5; Windows and Linux are not yet verified. See the [release checklist](docs/发布准备清单.md) and [acceptance record](docs/普适化验收记录.md).
 
 Version 0.2.0 has no account, payments, AI or enforced quotas. Existing local features are free; future support-edition proposals are drafts, not services currently offered for sale.
 
@@ -32,6 +32,7 @@ npm ci
 npm run typecheck
 npm test
 npm run build
+npm run check:release
 npm run check:public
 ```
 

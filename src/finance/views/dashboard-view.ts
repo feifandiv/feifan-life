@@ -260,11 +260,12 @@ function donutSvg(
     <circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="var(--fl-surface-3)" stroke-width="16"/>
     ${arcs}
     <text x="${cx}" y="${cy - 4}" text-anchor="middle" font-size="11.5" fill="var(--fl-text-sub)">合计</text>
-    <text x="${cx}" y="${cy + 13}" text-anchor="middle" font-size="13.5" font-weight="520" fill="var(--fl-text)">${formatMoney(total, sym)}</text>
+    <text class="fl-chart-total" x="${cx}" y="${cy + 13}" text-anchor="middle" font-size="13.5" font-weight="520" fill="var(--fl-text)"></text>
   </svg>`;
   const wrap = document.createElement('div');
   wrap.style.textAlign = 'center';
   wrap.innerHTML = svg;
+  wrap.querySelector('.fl-chart-total')!.textContent = formatMoney(total, sym);
   return wrap;
 }
 
@@ -381,7 +382,7 @@ function dailyTrendSvg(b: LedgerBucket, visible: Set<string>, sym: string): HTML
   const legend = series
     .map((s, i) => `<text x="${pad + i * 86}" y="15" font-size="10.5" fill="${s.color}">${s.label}</text>`)
     .join('');
-  const summary = `<text x="${W - pad}" y="15" text-anchor="end" font-size="10.5" fill="var(--fl-text-sub)">本月支出 ${formatMoney(data.reduce((sum, d) => sum + d.expense, 0), sym)}</text>`;
+  const summary = `<text class="fl-chart-summary" x="${W - pad}" y="15" text-anchor="end" font-size="10.5" fill="var(--fl-text-sub)"></text>`;
   const svg = `<svg class="fl-wide-chart" viewBox="0 0 ${W} ${H}" width="100%" xmlns="http://www.w3.org/2000/svg">
     ${legend}
     ${summary}
@@ -392,6 +393,7 @@ function dailyTrendSvg(b: LedgerBucket, visible: Set<string>, sym: string): HTML
   </svg>`;
   const el = document.createElement('div');
   el.innerHTML = svg;
+  el.querySelector('.fl-chart-summary')!.textContent = '本月支出 ' + formatMoney(data.reduce((sum, d) => sum + d.expense, 0), sym);
   return el;
 }
 

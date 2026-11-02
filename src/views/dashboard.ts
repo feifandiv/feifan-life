@@ -292,20 +292,14 @@ function habitStats(plugin: CommandCenterPlugin): { done: number; all: number } 
   const done = habits.filter((h) => (doneMap[h.id] || 0) >= (h.times || 1)).length;
   return { done, all: habits.length };
 }
-/* ---------- 模块 chrome（SVG 线性图标，对齐旧模块工具栏质感） ---------- */
+/* ---------- 模块标题 ---------- */
 const ICONS: Record<string, string> = {
-  overview: '<rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/>',
-  tasks: '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 7v10"/><path d="M16 7v6"/>',
-  finance: '<path d="M19 7V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2H5"/><circle cx="16.5" cy="13.5" r="1"/>',
-  life: '<path d="m3 5 2 2 4-4"/><path d="m3 13 2 2 4-4"/><path d="M13 6h8"/><path d="M13 14h8"/>',
-  habits: '<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-.22-4.05 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.15.43-2.29 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>',
-  review: '<rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 12h6"/><path d="M9 16h4"/>',
-  yearly: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>',
-  inspiration: '<path d="M9 18h6"/><path d="M10 22h4"/><path d="M8.2 14.7A7 7 0 1 1 15.8 14.7C14.7 15.5 14 16.6 14 18h-4c0-1.4-.7-2.5-1.8-3.3Z"/>',
+  overview: 'layout-dashboard', tasks: 'kanban', finance: 'wallet', life: 'list-checks',
+  habits: 'flame', review: 'clipboard-list', yearly: 'target', inspiration: 'lightbulb',
 };
 function modHead(panel: HTMLElement, icon: string, title: string, sub: string, actions?: { label: string; primary?: boolean; onClick: () => void }[]): void {
   const head = panel.createDiv({ cls: 'cc-mod-head' });
-  head.createDiv({ cls: 'micon' }).innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="17" height="17">' + (ICONS[icon] || '') + '</svg>';
+  setIcon(head.createDiv({ cls: 'micon' }), ICONS[icon] ?? 'layout-dashboard');
   const copy = head.createDiv({ cls: 'copy' });
   copy.createDiv({ cls: 'mtitle', text: title });
   copy.createDiv({ cls: 'msub', text: sub });

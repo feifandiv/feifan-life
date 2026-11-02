@@ -17,6 +17,8 @@
     "typecheck": "tsc --noEmit",
     "test": "node scripts/test.mjs",
     "check:public": "node scripts/check-public.mjs",
+    "check:release": "node scripts/check-release.mjs",
+    "licenses:inventory": "node scripts/license-inventory.mjs",
     "prepare:showcase": "npm run build && node scripts/prepare-showcase.mjs"
   },
   "devDependencies": {

@@ -1,6 +1,6 @@
 import esbuild from 'esbuild';
 import builtins from 'builtin-modules';
-import { mkdir, copyFile, readFile } from 'node:fs/promises';
+import { mkdir, copyFile, readFile, writeFile } from 'node:fs/promises';
 
 const mode = process.argv[2] ?? 'build';
 if (!['build', 'dev'].includes(mode)) throw new Error('Use build or dev. Automatic deployment is not supported.');
@@ -17,12 +17,15 @@ const context = await esbuild.context({
   format: 'cjs', target: 'es2018', logLevel: 'info',
   sourcemap: mode === 'dev' ? 'inline' : false,
   treeShaking: true, charset: 'utf8', outdir: output,
+  metafile: true,
   loader: { '.jpg': 'dataurl' },
   banner: { js: licenseBanner, css: licenseBanner },
 });
 if (mode === 'dev') await context.watch();
 else {
-  await context.rebuild();
+  const result = await context.rebuild();
+  await mkdir('.release-audit', { recursive: true });
+  await writeFile('.release-audit/build-meta.json', JSON.stringify(result.metafile, null, 2) + '\n');
   await context.dispose();
 }
 await copyFile('manifest.json', output + '/manifest.json');

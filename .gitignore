@@ -12,3 +12,4 @@ build/
 backups/
 review-output/
 .showcase/
+.release-audit/

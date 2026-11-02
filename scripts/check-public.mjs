@@ -4,7 +4,7 @@ import path from 'node:path';
 const root = process.cwd();
 const issues = [];
 let checked = 0;
-const excluded = new Set(['.git', 'node_modules', '.showcase']);
+const excluded = new Set(['.git', 'node_modules', '.showcase', '.release-audit']);
 const privateFiles = new Set(['data.json', 'snapshot.json', '.env', '.DS_Store']);
 const patterns = [
   ['absolute home directory', /\/(?:Users|home)\/[a-zA-Z0-9_.-]+\//],
