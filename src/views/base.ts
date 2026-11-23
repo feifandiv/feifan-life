@@ -1,12 +1,13 @@
 // 非凡人生 · 中央视图壳：Hero + 一级页签 + 模块挂载 + 右栏
 import { ItemView, WorkspaceLeaf, setIcon } from 'obsidian';
 import type CommandCenterPlugin from '../main';
+import { renderFocusCard } from './focus';
 import { FfMenu } from '../design-system/menu';
 import { FinancePanel } from '../finance/views/base';
 import { KanbanPanel } from '../kanban/views/base';
 import { LifePanel } from '../life/views/base';
-import { PRIORITIES, subtaskComplete, taskIsDone, taskSubtasks } from '../kanban/models';
-import { renderHero, renderWeatherCard, renderMonthCalCard, renderMonthOverviewCard, renderOverviewPanel, renderHabitsPanel, renderReviewPanel, renderPlanningPanel, renderInspirationPanel, fetchWeather, selectPlanningView } from './dashboard';
+import { subtaskComplete, taskIsDone, taskSubtasks } from '../kanban/models';
+import { renderHero, renderWeatherCard, renderMonthCalCard, renderMonthOverviewCard, renderOverviewPanel, renderHabitsPanel, renderReviewPanel, renderPlanningPanel, renderInspirationPanel, fetchWeather, selectPlanningView, refreshCalendarProgress } from './dashboard';
 
 export const VIEW_TYPE_CC = 'feifan-life-view';
 
@@ -45,6 +46,7 @@ export class CommandCenterView extends ItemView {
   private unsubs: (() => void)[] = [];
   private refreshTimer: number | null = null;
   private renderedDate = localDateKey();
+  private renderedMinute = '';
   private detachTheme: (() => void) | null = null;
 
   constructor(leaf: WorkspaceLeaf, private plugin: CommandCenterPlugin) {
@@ -340,57 +342,7 @@ export class CommandCenterView extends ItemView {
   }
 
   private renderRailFocus(host: HTMLElement): void {
-    host.empty();
-    const date = localDateKey();
-    const tasks = this.plugin.stores.kanban.getTasks() ?? [];
-    const taskMap = new Map(tasks.map((task) => [task.id, task]));
-    const projectOrder = new Map(this.plugin.stores.kanban.getProjects().map((project, index) => [project.id, index]));
-    const entries = (this.plugin.stores.root.data.cmd.focusPins ?? [])
-      .filter((pin) => pin.date === date)
-      .map((pin, index) => {
-        const task = taskMap.get(pin.taskId);
-        if (!task || task.archived) return null;
-        const subtask = pin.subtaskId
-          ? taskSubtasks(task).find((item) => item.id === pin.subtaskId)
-          : undefined;
-        if (pin.subtaskId && !subtask) return null;
-        return { pin, task, subtask, index };
-      })
-      .filter((entry): entry is NonNullable<typeof entry> => entry !== null)
-      .sort((a, b) => {
-        const doneA = a.subtask ? subtaskComplete(a.subtask) : taskIsDone(a.task);
-        const doneB = b.subtask ? subtaskComplete(b.subtask) : taskIsDone(b.task);
-        if (doneA !== doneB) return Number(doneA) - Number(doneB);
-        const projectA = a.task.projectId ? (projectOrder.get(a.task.projectId) ?? Number.MAX_SAFE_INTEGER - 1) : Number.MAX_SAFE_INTEGER;
-        const projectB = b.task.projectId ? (projectOrder.get(b.task.projectId) ?? Number.MAX_SAFE_INTEGER - 1) : Number.MAX_SAFE_INTEGER;
-        if (projectA !== projectB) return projectA - projectB;
-        const priority = PRIORITIES.indexOf(a.task.priority) - PRIORITIES.indexOf(b.task.priority);
-        return priority || a.index - b.index;
-      });
-    const remaining = entries.filter(({ task, subtask }) => !(subtask ? subtaskComplete(subtask) : taskIsDone(task))).length;
-    host.createDiv({ cls: 'card-title' }, (h) => {
-      h.createSpan({ text: '今日聚焦' });
-      h.createSpan({ cls: 'side num', text: remaining + '/' + entries.length });
-    });
-    if (!entries.length) host.createDiv({ cls: 'empty', text: '暂无' });
-    for (const { pin, task, subtask } of entries) {
-      const isDone = subtask ? subtaskComplete(subtask) : taskIsDone(task);
-      const row = host.createDiv({ cls: 'rail-item cc-focus-item' + (isDone ? ' done' : '') });
-      const copy = row.createDiv({ cls: 'cc-focus-copy' });
-      copy.createDiv({ cls: 't', text: subtask?.name ?? task.name });
-      if (subtask) copy.createDiv({ cls: 'cc-focus-parent', text: '所属任务 · ' + task.name });
-      copy.addEventListener('click', () => this.revealFocusItem(task.id, pin.subtaskId));
-      row.createSpan({ cls: 'cc-focus-priority ' + task.priority.toLowerCase(), text: task.priority });
-      const remove = row.createEl('button', {
-        cls: 'cc-focus-remove',
-        attr: { 'aria-label': '移出今日聚焦', title: '移出今日聚焦' },
-      });
-      setIcon(remove, 'target');
-      remove.addEventListener('click', (event) => {
-        event.stopPropagation();
-        this.toggleFocusPin(task.id, pin.subtaskId);
-      });
-    }
+    renderFocusCard(host, this.plugin);
   }
 
   private isFocusPinned(taskId: string, subtaskId?: string): boolean {
@@ -417,17 +369,19 @@ export class CommandCenterView extends ItemView {
     return pinned;
   }
 
-  private revealFocusItem(taskId: string, subtaskId?: string): void {
-    this.switchTab('tasks');
-    this.kanbanPanel.revealTask(taskId, subtaskId);
-  }
-
   private tickClock(): void {
     const now = new Date();
     const date = localDateKey(now);
     if (date !== this.renderedDate) {
       this.renderedDate = date;
+      const hero = this.containerEl.querySelector<HTMLElement>('.hero');
+      if (hero) renderHero(hero, this.plugin);
       this.refreshSoft();
+    }
+    const minute = date + ':' + now.getHours() + ':' + now.getMinutes();
+    if (minute !== this.renderedMinute) {
+      this.renderedMinute = minute;
+      refreshCalendarProgress(this.containerEl, now);
     }
     const el = this.containerEl.querySelector('.hero-clock');
     if (el) el.textContent = this.clockText();

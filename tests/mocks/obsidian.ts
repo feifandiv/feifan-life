@@ -34,8 +34,8 @@ export class Modal {
   contentEl = document.createElement('div');
   constructor(public app: unknown) { this.containerEl.append(this.titleEl, this.contentEl); }
   setTitle(value: string) { this.titleEl.textContent = value; }
-  open() {}
-  close() {}
+  open() { document.body.append(this.containerEl); (this as any).onOpen?.(); }
+  close() { (this as any).onClose?.(); this.containerEl.remove(); }
 }
 export class PluginSettingTab {
   containerEl = document.createElement('div');

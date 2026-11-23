@@ -10,6 +10,7 @@ export function closeModals(app: object): void {
 
 /** One lifecycle for all business dialogs, including body-mounted portals. */
 export class FfModal extends Modal {
+  protected initialFocusTarget: HTMLElement | null = null;
   private detachTheme: (() => void) | null = null;
   private returnFocus: HTMLElement | null = null;
   private initialFocusFrame = 0;
@@ -54,7 +55,9 @@ export class FfModal extends Modal {
     super.open();
     this.initialFocusFrame = requestAnimationFrame(() => {
       this.modalEl.setAttribute('aria-label', this.titleEl.textContent || this.contentEl.querySelector('.pk-modal__title,.cc-plan-modal-head')?.textContent || '非凡人生');
-      if (!this.modalEl.contains(this.modalEl.ownerDocument.activeElement)) {
+      if (this.initialFocusTarget?.isConnected && this.modalEl.contains(this.initialFocusTarget)) {
+        this.initialFocusTarget.focus();
+      } else if (!this.modalEl.contains(this.modalEl.ownerDocument.activeElement)) {
         (this.modalEl.querySelector<HTMLElement>('input:not(:disabled),textarea:not(:disabled),select:not(:disabled),button:not(:disabled)') ?? this.modalEl).focus();
       }
     });
@@ -65,6 +68,7 @@ export class FfModal extends Modal {
     if (!openDialogs.get(this.app)?.size) openDialogs.delete(this.app);
     closeSelect();
     cancelAnimationFrame(this.initialFocusFrame);
+    this.initialFocusTarget = null;
     this.modalEl.removeEventListener('keydown', this.trapFocus);
     super.close();
     const detach = this.detachTheme;

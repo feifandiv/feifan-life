@@ -6,7 +6,7 @@ The current interface is Chinese. Desktop only. A fresh installation starts empt
 
 [中文说明](README.zh-CN.md) · [Installation](docs/安装与使用.md) · [Privacy](PRIVACY.md) · [All screenshots](docs/screenshots/README.md)
 
-![Overview with fictional demonstration data](docs/screenshots/overview-light.png)
+![Overview with fictional demonstration data](docs/screenshots/overview-light.jpg)
 
 ## Features
 
@@ -19,9 +19,9 @@ The current interface is Chinese. Desktop only. A fresh installation starts empt
 
 ## Status
 
-[Version 0.2.0 is available on GitHub](https://github.com/feifandiv/feifan-life/releases/tag/0.2.0); not yet listed in the Obsidian community directory. Requires Obsidian 1.14.5 or later. Native checks used macOS with Obsidian 1.14.5; Windows and Linux are not yet verified. See the [release checklist](docs/发布准备清单.md) and [acceptance record](docs/普适化验收记录.md).
+[Version 0.2.1 is available on GitHub](https://github.com/feifandiv/feifan-life/releases/tag/0.2.1); not yet listed in the Obsidian community directory. Requires Obsidian 1.14.5 or later. The focus fixes in 0.2.1 were checked on macOS with Obsidian 1.15.0; the initial 0.2.0 native checks used Obsidian 1.14.5; Windows and Linux are not yet verified. See the [release checklist](docs/发布准备清单.md) and [acceptance record](docs/普适化验收记录.md).
 
-Version 0.2.0 has no account, payments, AI or enforced quotas. Existing local features are free; future support-edition proposals are drafts, not services currently offered for sale.
+Version 0.2.1 has no account, payments, AI or enforced quotas. Existing local features are free; future support-edition proposals are drafts, not services currently offered for sale.
 
 ## Build and Check
 
@@ -37,6 +37,10 @@ npm run check:public
 ```
 
 Build outputs are `build/main.js`, `build/manifest.json` and `build/styles.css`. The build does not install into a vault or copy any user data. Start testing in a new, empty vault; place only those three files in `<configDir>/plugins/feifan-life/`, then enable Feifan Life in Obsidian's community plugin settings.
+
+## Focus improvements in 0.2.1
+
+Overview and sidebar use the same pinned tasks and subtasks, completion counts and ordering. Complete items, remove pins or open task details in place; subtask details focus the selected row. Calendar percentages explicitly describe elapsed time, separate from focus completion.
 
 ## Personalization
 

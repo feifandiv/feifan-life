@@ -3,7 +3,7 @@
 // 优化-004：排序=优先级→完成度→建立序；展开/折叠局部化消除频闪；子项内联「当前」输入；
 // 子项组带层级引导线；量化指标右对齐
 // 优化-009：已完成任务置灰沉底 + 折叠成条；今日完成汇总条；30 天自动归档 + 查看归档开关）
-import { setIcon } from "obsidian";
+import { Notice, setIcon } from "obsidian";
 import { FfModal as Modal } from "../../design-system/modal";
 import type { KanbanCtx as ProjectKanbanPlugin } from '../models';
 import {
@@ -419,6 +419,12 @@ export function openTaskForm(plugin: ProjectKanbanPlugin): void {
   new TaskFormModal(plugin.app, plugin).open();
 }
 
+/** Open details in place without changing the current module or board filters. */
+export function openTaskDetail(plugin: ProjectKanbanPlugin, taskId: string, subtaskId?: string): void {
+  const task = plugin.store.getTasks().find((item: Task) => item.id === taskId);
+  if (task) new TaskDetailModal(plugin.app, plugin, task, subtaskId).open();
+}
+
 export function revealTaskInBoard(
   host: HTMLElement,
   plugin: ProjectKanbanPlugin,
@@ -551,7 +557,7 @@ class TaskDetailModal extends Modal {
   private inputs: Record<string, FieldControl> = {};
   private doneFlag: boolean;
 
-  constructor(app: import('obsidian').App, plugin: ProjectKanbanPlugin, task: Task) {
+  constructor(app: import('obsidian').App, plugin: ProjectKanbanPlugin, task: Task, private subtaskId?: string) {
     super(app);
     this.plugin = plugin;
     this.task = task;
@@ -665,24 +671,34 @@ class TaskDetailModal extends Modal {
     const cancel = right.createEl('button', { cls: 'pk-btn pk-btn--ghost', text: '取消' });
     cancel.addEventListener('click', () => this.close());
     const save = right.createEl('button', { cls: 'pk-btn pk-btn--primary', text: '保存' });
-    save.addEventListener('click', () => {
+    save.addEventListener('click', async () => {
+      if (save.disabled) return;
+      save.disabled = true;
       const projectId = this.inputs['projectId'].value === '__none__' ? null : this.inputs['projectId'].value;
-      void this.plugin.store.updateTask(this.task.id, {
-        name: this.inputs['name'].value.trim() || '未命名任务',
-        priority: this.inputs['priority'].value as Priority,
-        projectId,
-        dueDate: this.inputs['dueDate'].value.trim() || null,
-        tags: parseTags(this.inputs['tags'].value),
-        subtasks: editor.getSubtasks(),
-        note: this.inputs['note'].value,
-        done: this.doneFlag,
-      });
-      this.close();
+      try {
+        await this.plugin.store.updateTask(this.task.id, {
+          name: this.inputs['name'].value.trim() || '未命名任务',
+          priority: this.inputs['priority'].value as Priority,
+          projectId,
+          dueDate: this.inputs['dueDate'].value.trim() || null,
+          tags: parseTags(this.inputs['tags'].value),
+          subtasks: editor.getSubtasks(),
+          note: this.inputs['note'].value,
+          done: this.doneFlag,
+        });
+        this.close();
+      } catch {
+        new Notice('任务保存失败，请重试');
+      } finally { save.disabled = false; }
     });
 
-    // 自动聚焦任务名称
-    const nameInput = this.inputs['name'];
-    if (nameInput) nameInput.focus();
+    const target = Array.from(subContainer.querySelectorAll<HTMLElement>('[data-subtask-id]')).find(row => row.dataset.subtaskId === this.subtaskId);
+    if (target) {
+      target.classList.add('is-focus-target');
+      this.initialFocusTarget = target.querySelector<HTMLInputElement>('input.pk-sub__name');
+      this.initialFocusTarget?.focus();
+      target.scrollIntoView({ block: 'nearest' });
+    } else this.inputs['name']?.focus();
   }
 
   onClose(): void {

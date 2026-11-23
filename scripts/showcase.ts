@@ -7,7 +7,7 @@ import { CommandCenterView, type TabKey } from '../src/views/base';
 
 async function main() {
 // Synthetic examples live only in this development renderer, never in plugin defaults.
-const date = '2026-11-02';
+const date = process.env.SHOWCASE_DATE ?? '2026-11-02';
 const month = date.slice(0, 7);
 const now = new Date(date + 'T09:00:00+08:00').getTime();
 const dom = installDOM();

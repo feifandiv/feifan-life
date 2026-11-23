@@ -9,6 +9,7 @@ export function installDOM() {
     Object.defineProperty(globalThis, key, { configurable: true, value: dom.window[key].bind(dom.window) });
   }
   const prototype = dom.window.Element.prototype as any;
+  prototype.scrollIntoView = function() {};
   prototype.createEl = function(tag: string, info: any = {}, callback?: (element: HTMLElement) => void) {
     if (typeof info === 'function') { callback=info; info={}; }
     const element=dom.window.document.createElement(tag);

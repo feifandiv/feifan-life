@@ -12,6 +12,8 @@ import { renderPlanningPanel as renderPlanningPanelV2, selectPlanningView as sel
 import { avatarText, greetingText } from '../models/profile';
 import { vaultRelativePath } from '../models/paths';
 import { BUILTIN_BACKGROUNDS } from '../models/backgrounds';
+import { renderFocusCard, todayFocusEntries } from './focus';
+import { calendarTimeProgress } from '../models/focus';
 import { ReviewModal } from './review-form';
 
 const pad = (n: number) => String(n).padStart(2, '0');
@@ -103,9 +105,7 @@ export function renderHero(host: HTMLElement, plugin: CommandCenterPlugin): void
   const customQuotes = plugin.stores.root.data.cmd.quotes ?? [];
   const q = customQuotes.length ? customQuotes[(now.getDate() + quoteOffset) % customQuotes.length] : null;
   const y = now.getFullYear();
-  const yDays = ((y % 4 === 0 && y % 100 !== 0) || y % 400 === 0) ? 366 : 365;
-  const yPct = (((now.getTime() - new Date(y, 0, 1).getTime()) / 864e5 + 1) / yDays * 100).toFixed(1);
-  const mPct = (now.getDate() / new Date(y, now.getMonth() + 1, 0).getDate() * 100).toFixed(1);
+  const time = calendarTimeProgress(now);
 
   const main = host.createDiv({ cls: 'hero-main' });
   main.createDiv({ cls: 'hero-greet', text: greetingText(s.nickname, s.greeting, now) });
@@ -122,8 +122,8 @@ export function renderHero(host: HTMLElement, plugin: CommandCenterPlugin): void
   dateRow.createSpan({ cls: 'hero-date-big num', text: y + '年' + (now.getMonth() + 1) + '月' + now.getDate() + '日' });
   dateRow.createSpan({ cls: 'hero-date-sub', text: '周' + '日一二三四五六'[now.getDay()] + ' · 第 ' + isoWeek(now) + ' 周 · Q' + (Math.floor(now.getMonth() / 3) + 1) });
   const chips = main.createDiv({ cls: 'hero-chips' });
-  chips.createSpan({ cls: 'chip' }, (c) => { c.createSpan({ text: '↗ 今年 ' }); c.createSpan({ cls: 'num', text: yPct + '%' }); });
-  chips.createSpan({ cls: 'chip' }, (c) => { c.createSpan({ text: '◷ 本月 ' }); c.createSpan({ cls: 'num', text: mPct + '%' }); });
+  chips.createSpan({ cls: 'chip' }, (c) => { c.createSpan({ text: '↗ 今年时间已过 ' }); c.createSpan({ cls: 'num', text: time.year.toFixed(1) + '%', attr: { 'data-calendar-progress': 'year' } }); });
+  chips.createSpan({ cls: 'chip' }, (c) => { c.createSpan({ text: '◷ 本月时间已过 ' }); c.createSpan({ cls: 'num', text: time.month.toFixed(1) + '%', attr: { 'data-calendar-progress': 'month' } }); });
   const bg = chips.createEl('button', { cls: 'chip chip-btn', attr: { title: '背景设置', 'aria-label': '背景设置' } });
   setIcon(bg, 'image');
   bg.addEventListener('click', () => plugin.openPreferences());
@@ -196,10 +196,10 @@ export function renderMonthCalCard(host: HTMLElement, plugin: CommandCenterPlugi
   const head = host.createDiv({ cls: 'cal-head' });
   head.createSpan({ attr: { style: 'font-weight:500' } }).setText(y + ' 年 ' + (m + 1) + ' 月');
   const focus = todayFocusStats(plugin);
-  const progress = focus.total ? Math.round(focus.remaining / focus.total * 100) : 0;
+  const progress = focus.total ? Math.round(focus.done / focus.total * 100) : 0;
   const summary = head.createSpan({ cls: 'cal-summary' });
   summary.createSpan({ cls: 'cal-ring', attr: { style: '--cal-progress:' + progress + '%' } });
-  summary.createSpan({ cls: 'small faint num', text: focus.remaining + '/' + focus.total });
+  summary.createSpan({ cls: 'small faint num', text: focus.done + '/' + focus.total, attr: { title: '今日聚焦 · 已完成/总数' } });
   const grid = host.createDiv({ cls: 'cal-grid' });
   ['日', '一', '二', '三', '四', '五', '六'].forEach((x) => grid.createDiv({ cls: 'h', text: x }));
   for (let i = 0; i < 42; i++) {
@@ -255,26 +255,12 @@ export function renderMonthOverviewCard(host: HTMLElement, plugin: CommandCenter
 
 /* ---------- 各模块今日聚合 ---------- */
 function todayTasks(plugin: CommandCenterPlugin): any[] {
-  const t = today();
-  return plugin.stores.kanban.getTasks().filter((x) => !x.archived && (x.dueDate === t || (!taskIsDone(x) && x.dueDate && x.dueDate < t)));
+  const date = today();
+  return plugin.stores.kanban.getTasks().filter(task => !task.archived && (task.dueDate === date || (!taskIsDone(task) && task.dueDate && task.dueDate < date)));
 }
-function todayFocusStats(plugin: CommandCenterPlugin): { remaining: number; total: number } {
-  const tasks = plugin.stores.kanban.getTasks() ?? [];
-  const taskMap = new Map(tasks.map((task: any) => [task.id, task]));
-  let total = 0;
-  let remaining = 0;
-  for (const pin of plugin.stores.root.data.cmd.focusPins ?? []) {
-    if (pin.date !== today()) continue;
-    const task: any = taskMap.get(pin.taskId);
-    if (!task || task.archived) continue;
-    const subtask = pin.subtaskId
-      ? taskSubtasks(task).find((item) => item.id === pin.subtaskId)
-      : undefined;
-    if (pin.subtaskId && !subtask) continue;
-    total++;
-    if (!(subtask ? subtaskComplete(subtask) : taskIsDone(task))) remaining++;
-  }
-  return { remaining, total };
+function todayFocusStats(plugin: CommandCenterPlugin): { done: number; total: number } {
+  const entries = todayFocusEntries(plugin);
+  return { done: entries.filter(entry => entry.done).length, total: entries.length };
 }
 function todayFinance(plugin: CommandCenterPlugin): { out: number; inn: number } {
   const t = today(); let out = 0, inn = 0;
@@ -317,8 +303,8 @@ export function renderOverviewPanel(host: HTMLElement, plugin: CommandCenterPlug
   modHead(panel, 'overview', '总览 · 今日仪表盘', '全模块今日速览 · 数据实时计算', [
     { label: '新建任务 ＋', primary: true, onClick: () => (plugin.activeView)?.setTab('tasks') },
   ]);
-  const tt = todayTasks(plugin);
-  const doneN = tt.filter(taskIsDone).length;
+  const tt = todayFocusEntries(plugin);
+  const doneN = tt.filter(entry => entry.done).length;
   const fin = todayFinance(plugin);
   const hb = habitStats(plugin);
 
@@ -342,34 +328,19 @@ export function renderOverviewPanel(host: HTMLElement, plugin: CommandCenterPlug
   }
 
   const focus = panel.createDiv({ cls: 'card' });
-  focus.createDiv({ cls: 'card-title' }, (t) => { t.createSpan({ text: '今日聚焦' }); t.createSpan({ cls: 'side num', text: doneN + '/' + tt.length }); });
-  if (!tt.length) focus.createDiv({ cls: 'empty', text: '今天没有安排，去「任务」页或右栏快速添加一件吧' });
-  for (const t of tt) {
-    const proj = (plugin.stores.root.data.kanban?.projects ?? []).find((p: any) => p.id === t.projectId);
-    const isDone = taskIsDone(t);
-    const row = focus.createDiv({ cls: 'ov-focus-item' + (isDone ? ' done' : '') });
-    const ck = row.createSpan({ cls: 'ck' + (isDone ? ' on' : ''), text: '✓' });
-    ck.addEventListener('click', () => {
-      void plugin.stores.kanban.setTaskDone(t.id, !isDone);
-    });
-    const g = row.createDiv({ cls: 'grow' });
-    g.createDiv({ cls: 't', text: t.name });
-    const meta = g.createDiv({ cls: 'meta' });
-    if (proj) meta.createSpan({ cls: 'tag', text: proj.name });
-    if (t.priority) meta.createSpan({ cls: 'small pri-' + t.priority, text: t.priority });
-  }
+  renderFocusCard(focus, plugin);
 
-  const now = new Date(); const y = now.getFullYear();
-  const yDays = ((y % 4 === 0 && y % 100 !== 0) || y % 400 === 0) ? 366 : 365;
+  const time = calendarTimeProgress();
   const bars = panel.createDiv({ cls: 'ov-bars' });
-  const mkBar = (k: string, v: string, pct: number) => {
+  const mkBar = (k: string, v: string, pct: number, period?: 'year' | 'month') => {
     const c = bars.createDiv({ cls: 'ov-bar-card' });
-    c.createDiv({ cls: 'k' }, (kk) => { kk.createSpan({ text: k }); kk.createSpan({ cls: 'num', text: v }); });
-    c.createDiv({ cls: 'bar' }).createEl('i', { attr: { style: 'width:' + Math.min(100, pct) + '%' } });
+    c.createDiv({ cls: 'k' }, (kk) => { kk.createSpan({ text: k }); const value = kk.createSpan({ cls: 'num', text: v }); if (period) value.dataset.calendarProgress = period; });
+    const fill = c.createDiv({ cls: 'bar' }).createEl('i', { attr: { style: 'width:' + Math.min(100, pct) + '%' } });
+    if (period) fill.dataset.calendarBar = period;
   };
-  mkBar('今年进度', yPctOf(now), ((now.getTime() - new Date(y, 0, 1).getTime()) / 864e5 + 1) / yDays * 100);
-  mkBar('本月进度', (now.getDate() / new Date(y, now.getMonth() + 1, 0).getDate() * 100).toFixed(1) + '%', now.getDate() / new Date(y, now.getMonth() + 1, 0).getDate() * 100);
-  mkBar('今日聚焦', tt.length ? doneN + '/' + tt.length + ' · ' + Math.round(doneN / tt.length * 100) + '%' : '0/0', tt.length ? doneN / tt.length * 100 : 0);
+  mkBar('今年时间已过', time.year.toFixed(1) + '%', time.year, 'year');
+  mkBar('本月时间已过', time.month.toFixed(1) + '%', time.month, 'month');
+  mkBar('聚焦完成率', tt.length ? doneN + '/' + tt.length + ' · ' + Math.round(doneN / tt.length * 100) + '%' : '0/0', tt.length ? doneN / tt.length * 100 : 0);
 
   const acts = panel.createDiv({ cls: 'ov-actions' });
   const mkAct = (label: string, tab: TabKey) => {
@@ -378,12 +349,15 @@ export function renderOverviewPanel(host: HTMLElement, plugin: CommandCenterPlug
   };
   mkAct('记一笔', 'finance'); mkAct('记清单', 'life'); mkAct('打开任务看板', 'tasks');
 }
-function yPctOf(now: Date): string {
-  const y = now.getFullYear();
-  const yDays = ((y % 4 === 0 && y % 100 !== 0) || y % 400 === 0) ? 366 : 365;
-  return (((now.getTime() - new Date(y, 0, 1).getTime()) / 864e5 + 1) / yDays * 100).toFixed(1) + '%';
-}
 
+/** Refresh the clock indicators without rebuilding forms or interrupting input. */
+export function refreshCalendarProgress(host: HTMLElement, now = new Date()): void {
+  const time = calendarTimeProgress(now);
+  for (const period of ['year', 'month'] as const) {
+    host.querySelectorAll<HTMLElement>(`[data-calendar-progress="${period}"]`).forEach(el => { el.textContent = time[period].toFixed(1) + '%'; });
+    host.querySelectorAll<HTMLElement>(`[data-calendar-bar="${period}"]`).forEach(el => { el.style.width = time[period] + '%'; });
+  }
+}
 /* ---------- 图表曲线 ---------- */
 function smoothPath(pts: [number, number][]): string {
   if (!pts.length) return '';

@@ -178,6 +178,7 @@ export function mountSubtaskEditor(
     }
     subs.forEach((s, idx) => {
       const rowEl = container.createDiv({ cls: 'pk-sub' });
+      rowEl.dataset.subtaskId = s.id;
 
       if (showDone) {
         const cb = rowEl.createEl('input', { cls: 'pk-sub__check' });
